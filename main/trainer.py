@@ -32,7 +32,7 @@ def trainer_synapse(args, model, snapshot_path):
     def worker_init_fn(worker_id):
         random.seed(args.seed + worker_id)
 
-    trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True,
+    trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True,
                              worker_init_fn=worker_init_fn)
     if args.n_gpu > 1:
         model = nn.DataParallel(model)
@@ -70,19 +70,16 @@ def trainer_synapse(args, model, snapshot_path):
             logging.info('iteration %d : loss : %f, loss_ce: %f' % (iter_num, loss.item(), loss_ce.item()))
 
             if iter_num % 20 == 0:
-                # image = image_batch[1, 0:1, :, :]
-                image = image_batch[0, 0:1, :, :]
+                image = image_batch[1, 0:1, :, :]
                 image = (image - image.min()) / (image.max() - image.min())
                 writer.add_image('train/Image', image, iter_num)
                 outputs = torch.argmax(torch.softmax(outputs, dim=1), dim=1, keepdim=True)
-                # writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
-                writer.add_image('train/Prediction', outputs[0, ...] * 50, iter_num)
-                # labs = label_batch[1, ...].unsqueeze(0) * 50
-                labs = label_batch[0, ...].unsqueeze(0) * 50
+                writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
+                labs = label_batch[1, ...].unsqueeze(0) * 50
                 writer.add_image('train/GroundTruth', labs, iter_num)
 
         save_interval = 10
-        if epoch_num > int(max_epoch / 3) and (epoch_num + 1) % save_interval == 0:
+        if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
             filename = f'{args.config_file}_epoch_{epoch_num}.pth'
             save_mode_path = os.path.join(snapshot_path, filename)
             torch.save(model.state_dict(), save_mode_path)
