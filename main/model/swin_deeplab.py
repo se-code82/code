@@ -1,14 +1,11 @@
 import torch
 from torch import nn
-
 import config
 from model.encoder import build_encoder
 from model.decoder import build_decoder
 from model.aspp import build_aspp
-from torchsummary import summary
-from model.configs.swin_224_7_2level import EncoderConfig
-from model.configs.swin_224_7_2level import ASPPConfig
-from model.configs.swin_224_7_2level import DecoderConfig
+
+
 class SwinDeepLab(nn.Module):
     def __init__(self, encoder_config, aspp_config, decoder_config):
         super().__init__()
@@ -40,11 +37,4 @@ class SwinDeepLab(nn.Module):
         low_level, high_level = self.run_encoder(x)
         x = self.run_aspp(high_level)
         x = self.run_decoder(low_level, x)
-        
         return x
-
-
-if __name__ == "__main__":
-    model = SwinDeepLab(EncoderConfig, ASPPConfig, DecoderConfig).cuda()
-    print(model,(3,224,224))
-    summary(model)
