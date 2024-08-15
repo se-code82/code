@@ -1,11 +1,10 @@
-import copy
+
 from collections import OrderedDict
 import torch
 from torch import nn
-
 from model.backbones.swin import BasicLayer
 from model.cross_attn import CBAMBlock
-from torchsummary import summary
+
 class SwinASPP(nn.Module):
     def __init__(self, input_size, input_dim, out_dim, cross_attn,
                  depth, num_heads, mlp_ratio, qkv_bias, qk_scale,
@@ -165,22 +164,11 @@ def build_aspp(input_size, input_dim, out_dim, config):
         )
     
 
-
-
 if __name__ == '__main__':
-    from model.configs.swin_224_7_2level import ASPPConfig
-    
+
     batch = torch.randn(2, 24, 24, 384)
     model = build_aspp(24, 384, 96, ASPPConfig)
-    print(model)
-    summary(model)
-
     print("Num of parameters: ", sum([p.numel() for p in model.parameters()])/10**6)
     print(model.possible_window_sizes)
-
     out = model(batch)
     print(out.shape)
-
-
-    # for item in out:
-    #     print(item.shape)
