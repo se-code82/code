@@ -5,9 +5,6 @@ from scipy.ndimage import zoom
 import torch.nn as nn
 import SimpleITK as sitk
 import copy
-from tkinter import *
-from PIL import ImageTk
-from PIL import Image
 
 class DiceLoss(nn.Module):
     def __init__(self, n_classes):
@@ -76,20 +73,6 @@ def Miou_score(pred, gt, num_classes):
     return mean_iou
 
 
-def metrics_all(pred, gt):
-    smooth = 1e-5
-    tp = pred & gt
-    fn = ((pred == 0) & (gt == 1)).astype('int')
-    fp = ((pred == 1) & (gt == 0)).astype('int')
-    tn = ((pred == 0) & (gt == 0)).astype('int')
-
-    precision = (tp.sum()+smooth) / (tp.sum() + fp.sum()+smooth)
-    Acc = (tp.sum()+tn.sum()+smooth) / (tp.sum()+fn.sum()+fp.sum()+tn.sum()+smooth)
-    recall = (tp.sum()+ smooth)/ (tp.sum() + fn.sum()+smooth)
-    f1 = 2 * precision * recall / (precision + recall)
-
-    return float(f1), float(precision), float(recall), float(Acc)
-
 
 def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_save_path=None, case=None, z_spacing=1):
     image, label = image.squeeze(0).cpu().detach().numpy(), label.squeeze(0).cpu().detach().numpy()
@@ -112,18 +95,10 @@ def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_s
             prediction = out
 
     metric_list = []
-    metric_list1 = []
-    metric_list2 = []
 
 
     for i in range(1, classes):
         metric_list.append(calculate_metric_percase(prediction == i, label == i))
-
-
-    for i in range(1, classes):
-        metric_list1.append(Miou_score(prediction == i, label == i, classes))
-        metric_list2.append(metrics_all(prediction == i, label == i))
-
 
 
     if test_save_path is not None:
@@ -133,18 +108,15 @@ def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_s
 
         a1[a1 == 1] = 255
         a1[a1 == 2] = 207
-        a1[a1 == 3] = 255
-        a1[a1 == 4] = 20
+
         #
         a2[a2 == 1] = 255
         a2[a2 == 2] = 53
-        a2[a2 == 3] = 0
-        a2[a2 == 4] = 10
+
         #
         a3[a3 == 1] = 255
         a3[a3 == 2] = 46
-        a3[a3 == 3] = 0
-        a3[a3 == 4] = 120
+  
 
 
         a1 = Image.fromarray(np.uint8(a1)).convert('L')
@@ -153,7 +125,7 @@ def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_s
         prediction = Image.merge('RGB', [a1, a2, a3])
         prediction.save(test_save_path+'/'+case+'.png')
 
-    return metric_list, metric_list1, metric_list2
+    return metric_list
 
 def get_num_parameters(net):
     encoder_p = sum([p.numel() for p in net.encoder.parameters()]) / 10**6
