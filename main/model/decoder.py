@@ -1,14 +1,11 @@
 import math
-import copy
 from collections import OrderedDict
-
 import torch
 from torch import nn
 import torch.utils.checkpoint as checkpoint
 from einops import rearrange
-
 from model.backbones.swin import SwinTransformerBlock
-from torchsummary import summary
+
 class PatchExpand(nn.Module):
     def __init__(self, input_resolution, dim, dim_scale=2, norm_layer=nn.LayerNorm):
         super().__init__()
