@@ -1,14 +1,12 @@
-# inherited from swin_224_7_15
-# cross attn and High level norm off
 
 class EncoderConfig:    
     encoder_name = 'swin'
     load_pretrained = True
     
-    img_size = 224
+    img_size = 
     window_size = 7
 
-    patch_size = 4
+    patch_size = 
     in_chans = 3
     embed_dim = 96
 
@@ -68,9 +66,8 @@ class DecoderConfig:
 
     window_size = EncoderConfig.window_size
     
-    # num_classes = 9
-    num_classes = 3
-    # num_classes = 2
+    num_classes =9 
+
     
     low_level_idx = EncoderConfig.low_level_idx
     high_level_idx = EncoderConfig.high_level_idx
