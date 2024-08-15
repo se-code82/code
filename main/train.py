@@ -24,26 +24,26 @@ parser.add_argument('--list_dir', type=str,
                     default='./lists/lists_Synapse', help='list dir')
 
 parser.add_argument('--num_classes', type=int,
-                    default=3, help='output channel of network')
+                    default=, help='output channel of network')
 
 parser.add_argument('--output_dir', type=str, default='', help='output dir')
 
 parser.add_argument('--max_iterations', type=int,
-                    default=30000, help='maximum epoch number to train')
+                    default=, help='maximum epoch number to train')
 parser.add_argument('--max_epochs', type=int,
-                    default=100, help='maximum epoch number to train')
+                    default=, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
-                    default=6, help='batch_size per gpu')
+                    default=, help='batch_size per gpu')
 parser.add_argument('--n_gpu', type=int, default=1, help='total gpu')
 parser.add_argument('--deterministic', type=int,  default=1,
                     help='whether use deterministic training')
 parser.add_argument('--base_lr', type=float,  default=0.01,
                     help='segmentation network learning rate')
 parser.add_argument('--img_size', type=int,
-                    default=224, help='input patch size of network input')
+                    default=, help='input patch size of network input')
 parser.add_argument('--seed', type=int,
                     default=1234, help='random seed')
-# parser.add_argument('--cfg', type=str, required=True, metavar="FILE", help='path to config file', )
+# parser.add_argument('--cfg', type=str, metavar="FILE", help='path to config file', )
 parser.add_argument(
         "--opts",
         help="Modify config options by adding 'KEY VALUE' pairs. ",
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         'Synapse': {
             'root_path': args.root_path,
             'list_dir': './lists/lists_Synapse',
-            'num_classes': 3,
+            'num_classes':,
         },
     }
 
@@ -116,17 +116,13 @@ if __name__ == "__main__":
     ).cuda()
     
     if model_config.EncoderConfig.encoder_name == 'swin' and model_config.EncoderConfig.load_pretrained:
-        # net.encoder.load_from('./pretrained_ckpt/swin_tiny_patch4_window7_224.pth')
-        net.encoder.load_from('model/configs/swin_tiny_patch4_window7_224.pth')
+        # net.encoder.load_from('./pretrained_ckpt/')
     if model_config.ASPPConfig.aspp_name == 'swin' and model_config.ASPPConfig.load_pretrained:
-        # net.aspp.load_from('./pretrained_ckpt/swin_tiny_patch4_window7_224.pth')
-        net.aspp.load_from('model/configs/swin_tiny_patch4_window7_224.pth')
+        # net.aspp.load_from('./pretrained_ckpt/')
     if model_config.DecoderConfig.decoder_name == 'swin' and model_config.DecoderConfig.load_pretrained and not model_config.DecoderConfig.extended_load:
         # net.decoder.load_from('./pretrained_ckpt/swin_tiny_patch4_window7_224.pth')
-        net.decoder.load_from('model/configs/swin_tiny_patch4_window7_224.pth')
     if model_config.DecoderConfig.decoder_name == 'swin' and model_config.DecoderConfig.load_pretrained and model_config.DecoderConfig.extended_load:
-        # net.decoder.load_from_extended('./pretrained_ckpt/swin_tiny_patch4_window7_224.pth')
-        net.decoder.load_from_extended('model/configs/swin_tiny_patch4_window7_224.pth')
+        # net.decoder.load_from_extended('./pretrained_ckpt/')
     
     trainer = {'Synapse': trainer_synapse,}
     trainer[dataset_name](args, net, args.output_dir)
