@@ -1,15 +1,12 @@
 import os
 import urllib.request
-import timm
 import torch
 from torch import nn
-
 import config
 import model.backbones.resnets as resnets
 from model.backbones.swin import SwinEncoder
 from model.backbones.xception import AlignedXception
 from model.backbones.sync_batchnorm.batchnorm import SynchronizedBatchNorm2d
-from torchsummary import summary
 
 
 def build_encoder(config):
@@ -75,26 +72,5 @@ def build_encoder(config):
         model.low_level_dim = 128
         
         return model
-
-
-# if __name__ == "__main__":
-#     # model = VisionTransformer(config=configs.get_r50_b16_config(), img_size=512, num_classes=3, zero_head=False, vis=False).cuda()
-#     # # print(model)
-#     # summary(model, (3, 512, 512),device='cuda')
-#     # # print(summary(model, input_size=(3, 512, 512), batch_size=6))
-#     # # dummy_input = torch.randn(1, 3, 512, 512).to('cuda')
-#     # # print(dummy_input)
-#     # # flops, params = profile(model, (dummy_input,))
-#     # # print('flops: ', flops, 'params: ', params)
-#     model = build_encoder(128).cuda()
-#
-#     print(model)
-#     summary(model, (3, 224, 224))
-    # # summary(model, input_size=(3, 224, 224), batch_size=4)
-
-    # dummy_input = torch.randn(1, 3, 512, 512).to('cuda')
-    # print(dummy_input)
-    # flops, params = profile(model, (dummy_input,))
-    # print('flops: ', flops, 'params: ', params)
         
         
