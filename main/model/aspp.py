@@ -162,13 +162,3 @@ def build_aspp(input_size, input_dim, out_dim, config):
             downsample=config.downsample,
             use_checkpoint=config.use_checkpoint
         )
-    
-
-if __name__ == '__main__':
-
-    batch = torch.randn(2, 24, 24, 384)
-    model = build_aspp(24, 384, 96, ASPPConfig)
-    print("Num of parameters: ", sum([p.numel() for p in model.parameters()])/10**6)
-    print(model.possible_window_sizes)
-    out = model(batch)
-    print(out.shape)
