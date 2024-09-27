@@ -20,7 +20,6 @@ class SwinASPP(nn.Module):
         else:
             self.possible_window_sizes = [i for i in range(start_window_size, input_size+1) if input_size%i==0]
 
-        self.layers = nn.ModuleList()
         for ws in self.possible_window_sizes:
             layer = BasicLayer(dim=int(input_dim),
                                input_resolution=(input_size, input_size),
@@ -44,8 +43,7 @@ class SwinASPP(nn.Module):
                                   out_dim=out_dim)
         else:
             self.proj = nn.Linear(len(self.layers)*input_dim, out_dim)
-        
-        # Check if needed
+
         self.norm = norm_layer(out_dim) if aspp_norm else None
         if aspp_activation == 'relu':
             self.activation = nn.ReLU()
@@ -57,11 +55,6 @@ class SwinASPP(nn.Module):
         self.dropout = nn.Dropout(aspp_dropout)
 
     def forward(self, x):
-        """
-        x: input tensor (high level features) with shape (batch_size, input_size, input_size, input_dim)
-
-        returns ...
-        """
         B, H, W, C = x.shape
         x = x.view(B, H*W, C)
 
@@ -73,7 +66,6 @@ class SwinASPP(nn.Module):
         features = torch.cat(features, dim=-1)
         features = self.proj(features)
 
-        # Check if needed 
         if self.norm is not None:
             features = self.norm(features)
         if self.activation is not None:
@@ -96,17 +88,12 @@ class SwinASPP(nn.Module):
                         print("delete key:{}".format(k))
                         del pretrained_dict[k]
                 msg = self.load_state_dict(pretrained_dict,strict=False)
-                # print(msg)
                 return
             pretrained_dict = pretrained_dict['model']
-            print("---start load pretrained modle of swin encoder---")
-
             model_dict = self.state_dict()
             num_layers = len(self.layers)
             num_pretrained_layers = set([int(k[7]) for k, v in pretrained_dict.items() if 'layers' in k])
-
             full_dict = copy.deepcopy(pretrained_dict)
-            
             layer_dict = OrderedDict()
             
             for i in range(num_layers):
@@ -129,8 +116,6 @@ class SwinASPP(nn.Module):
                             elif k not in model_dict:
                                 del layer_dict[k]
             msg = self.load_state_dict(layer_dict, strict=False)
-            # print(msg)
-            
             print(f"ASPP Found Weights: {len(layer_dict)}")
         else:
             print("none pretrain")
