@@ -4,7 +4,6 @@ import torch
 from torch import nn
 import torch.utils.checkpoint as checkpoint
 from einops import rearrange
-from model.backbones.swin import SwinTransformerBlock
 
 class PatchExpand(nn.Module):
     def __init__(self, input_resolution, dim, dim_scale=2, norm_layer=nn.LayerNorm):
@@ -15,13 +14,10 @@ class PatchExpand(nn.Module):
         self.norm = norm_layer(dim)
 
     def forward(self, x):
-        """
-        x: B, H*W, C
-        """
         H, W = self.input_resolution
         x = self.expand(x)
         B, L, C = x.shape
-        assert L == H * W, "input feature has wrong size"
+        assert L == H * W, 
 
         x = x.view(B, H, W, C)
         x = rearrange(x, 'b h w (p1 p2 c)-> b (h p1) (w p2) c', p1=2, p2=2, c=C//4)
@@ -41,9 +37,7 @@ class FinalPatchExpand_X4(nn.Module):
         self.norm = norm_layer(self.output_dim)
 
     def forward(self, x):
-        """
-        x: B, H*W, C
-        """
+
         H, W = self.input_resolution
         x = self.expand(x)
         B, L, C = x.shape
@@ -57,24 +51,6 @@ class FinalPatchExpand_X4(nn.Module):
         return x
 
 class BasicLayer_up(nn.Module):
-    """ A basic Swin Transformer layer for one stage.
-
-    Args:
-        dim (int): Number of input channels.
-        input_resolution (tuple[int]): Input resolution.
-        depth (int): Number of blocks.
-        num_heads (int): Number of attention heads.
-        window_size (int): Local window size.
-        mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
-        qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. Default: True
-        qk_scale (float | None, optional): Override default qk scale of head_dim ** -0.5 if set.
-        drop (float, optional): Dropout rate. Default: 0.0
-        attn_drop (float, optional): Attention dropout rate. Default: 0.0
-        drop_path (float | tuple[float], optional): Stochastic depth rate. Default: 0.0
-        norm_layer (nn.Module, optional): Normalization layer. Default: nn.LayerNorm
-        downsample (nn.Module | None, optional): Downsample layer at the end of the layer. Default: None
-        use_checkpoint (bool): Whether to use checkpointing to save memory. Default: False.
-    """
 
     def __init__(self, dim, input_resolution, depth, num_heads, window_size,
                  mlp_ratio=4., qkv_bias=True, qk_scale=None, drop=0., attn_drop=0.,
@@ -170,10 +146,6 @@ class SwinDecoder(nn.Module):
         self.output = nn.Conv2d(int(input_dim)*2, num_classes, kernel_size=1, bias=False)
 
     def forward(self, low_level, aspp):
-        """
-        low_level: B, Hl, Wl, C
-        aspp: B, Ha, Wa, C
-        """
         B, Hl, Wl, C = low_level.shape
         _, Ha, Wa, _ = aspp.shape
 
